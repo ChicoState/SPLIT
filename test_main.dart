@@ -5,6 +5,12 @@ import 'package:flutter/gestures.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'package:flutter/foundation.dart';
 
+//imports for the calendar and google authentication
+/*import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import "package:googleapis_auth/auth_io.dart";
+import 'package:googleapis/calendar/v3.dart' as prefix;*/
+
 void main() {
   runApp(MaterialApp(
     initialRoute: '/',
