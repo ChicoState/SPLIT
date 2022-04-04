@@ -6,10 +6,10 @@ import 'package:toggle_switch/toggle_switch.dart';
 import 'package:flutter/foundation.dart';
 
 //imports for the calendar and google authentication
-/*import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import "package:googleapis_auth/auth_io.dart";
-import 'package:googleapis/calendar/v3.dart' as prefix;*/
+import 'package:googleapis/calendar/v3.dart' as prefix;
 
 void main() {
   runApp(MaterialApp(
@@ -19,6 +19,7 @@ void main() {
       '/homepage': (context) => HomePage(),
       '/register': (context) => Register(),
       '/group': (context) => Group(),
+      '/group': (context) => DateTimePicker(),
     },
   ));
 }
@@ -419,3 +420,263 @@ class _GroupState extends State<Group> {
 
   }
 }
+
+//CALENDAR BEGINS HERE
+class DateTimePicker extends StatefulWidget {
+  @override
+  _DateTimePickerState createState() => _DateTimePickerState();
+
+}
+
+class _DateTimePickerState extends State<DateTimePicker> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Calendar(),
+    );
+  }
+}
+
+
+class Calendar extends StatefulWidget {
+  @override
+  _CalendarState createState() => _CalendarState();
+
+}
+
+//final _nameController = TextEditingController();
+class _CalendarState extends State<Calendar> {
+  final _nameController = TextEditingController();
+  String _date = "Date of Event";
+  String _starttime = "Start Time";
+  String _endtime = "End Time";//insert event time button just like Start time
+  String _name = "Not Set";
+
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('DateTime Picker'),
+      ),
+      body: Padding(
+        //Textbox('Hello World'),
+        padding: const EdgeInsets.all(16.0),
+        child: Container(
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              //ADD INSERT EVENT BUTTON
+              //Text('$_date'),
+              RaisedButton(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0)),
+                elevation: 4.0,
+                onPressed: () {
+                  DatePicker.showDatePicker(context,
+                      theme: DatePickerTheme(
+                        containerHeight: 210.0,
+                      ),
+                      showTitleActions: true,
+                      minTime: DateTime(2000, 1, 1),
+                      maxTime: DateTime(2222, 12, 31), onConfirm: (date) {
+                        print('confirm $date');
+                        _date = '${date.year} - ${date.month} - ${date.day}';
+                        setState(() {});
+                      }, currentTime: DateTime.now(), locale: LocaleType.en);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  height: 50.0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Container(
+                            child: Row(
+                              children: <Widget>[
+                                Icon(
+                                  Icons.date_range,
+                                  size: 18.0,
+                                  color: Colors.teal,
+                                ),
+                                Text(
+                                  " $_date",
+                                  style: TextStyle(
+                                      color: Colors.teal,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18.0),
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                      Text(
+                        "  Change",
+                        style: TextStyle(
+                            color: Colors.teal,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18.0),
+                      ),
+                    ],
+                  ),
+                ),
+                color: Colors.white,
+              ),
+              SizedBox(
+                height: 20.0,
+              ),
+              RaisedButton(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0)),
+                elevation: 4.0,
+                onPressed: () {
+                  DatePicker.showTimePicker(context,
+                      theme: DatePickerTheme(
+                        containerHeight: 210.0,
+                      ),
+                      showTitleActions: true, onConfirm: (time) {
+                        print('confirm $time');
+                        _starttime = '${time.hour} : ${time.minute} : ${time.second}';
+                        setState(() {});
+                      }, currentTime: DateTime.now(), locale: LocaleType.en);
+                  setState(() {});
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  height: 50.0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Container(
+                            child: Row(
+                              children: <Widget>[
+                                Icon(
+                                  Icons.access_time,
+                                  size: 18.0,
+                                  color: Colors.teal,
+                                ),
+                                Text(
+                                  " $_starttime",
+                                  style: TextStyle(
+                                      color: Colors.teal,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18.0),
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                      Text(
+                        "  Change",
+                        style: TextStyle(
+                            color: Colors.teal,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18.0),
+                      ),
+                    ],
+                  ),
+                ),
+                color: Colors.white,
+              ),
+              RaisedButton(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0)),
+                elevation: 4.0,
+                onPressed: () {
+                  DatePicker.showTimePicker(context,
+                      theme: DatePickerTheme(
+                        containerHeight: 210.0,
+                      ),
+                      showTitleActions: true, onConfirm: (time) {
+                        print('confirm $time');
+                        _endtime = '${time.hour} : ${time.minute} : ${time.second}';
+                        setState(() {});
+                      }, currentTime: DateTime.now(), locale: LocaleType.en);
+                  setState(() {});
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  height: 50.0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Container(
+                            child: Row(
+                              children: <Widget>[
+                                Icon(
+                                  Icons.access_time,
+                                  size: 18.0,
+                                  color: Colors.teal,
+                                ),
+                                Text(
+                                  " $_endtime",
+                                  style: TextStyle(
+                                      color: Colors.teal,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18.0),
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                      Text(
+                        "  Change",
+                        style: TextStyle(
+                            color: Colors.teal,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18.0),
+                      ),
+                    ],
+                  ),
+                ),
+                color: Colors.white,
+              ),
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  border: UnderlineInputBorder(),
+                  labelText: 'Enter Event name',
+                  ),
+              ),
+              TextButton(
+                onPressed:(){
+                  _name = _nameController.text;
+                  //print("Event name is: $_name");
+                },
+                child: Text("Enter Event")
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+ /* @override
+  void createCRED() {
+    var _credentials = "";
+    if (io2.Platform.isAndroid)
+    {
+      _credentials = new ClientId(222352036945-3dkkfiehp7aavm1qur67fvevgbevvofi.apps.googleusercontent.com);
+    }
+
+  }*/
+
+}
+//CALENDAR ENDS HERE
