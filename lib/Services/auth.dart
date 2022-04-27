@@ -3,6 +3,7 @@ import 'package:split/Models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:split/Services/database.dart';
 
+//changed to return null fixed the loading screen
 
 class AuthService{
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -26,7 +27,8 @@ class AuthService{
       return _userfromFirebase(user!);
     }catch(e){
       print(e.toString());
-      return e;
+      return null;
+      //return e;
     }
   }
 
@@ -36,24 +38,29 @@ class AuthService{
       UserCredential result = await _auth.signInWithEmailAndPassword(email: email.trim(), password: password.trim());
       User? user = result.user;
 
+      //wrong place maybe?
       //create a user with the uid
-      await DataBaseService(uid: user!.uid).updateUserData('name');
+      //await DataBaseService(uid: user!.uid).updateUserData('name');
       return _userfromFirebase(user);
     }on FirebaseAuthException catch(e){
       print(e.toString());
-      return e.message;
+      return null;
+      //return e.message;
     }
   }
 
   //register with email and pass
-  Future registerWithEmailAndPassword(String email, String password) async{
+  Future registerWithEmailAndPassword(String email, String password, String name, bool notification) async{
     try{
       UserCredential result = await _auth.createUserWithEmailAndPassword(email: email.trim(), password: password.trim());
       User? user = result.user;
+      //create a new document for user with UID
+      await DataBaseService(uid: user!.uid).updateUserData(email, name, notification);
       return _userfromFirebase(user);
     }on FirebaseAuthException catch(e){
       print(e.toString());
-      return e.message;
+      return null;
+      //return e.message;
     }
   }
 

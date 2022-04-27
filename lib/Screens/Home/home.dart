@@ -1,8 +1,18 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:split/Models/user.dart';
 import 'package:split/Services/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:split/Services/database.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:split/Screens/Groups/Create Groups.dart';
+import 'package:split/Services/database.dart';
+import 'package:split/Screens/Home/users_list.dart';
+import 'package:split/Models/appUser.dart';
+
+import '../../Models/appUser.dart';
+
+
 
 class Home extends StatelessWidget {
 
@@ -73,128 +83,106 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   bool notifications = false;
+  String name = '';
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text(
-          "Name (First and Last Name)",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
+    return StreamProvider<List<AppUser>>.value(
+      value: DataBaseService(uid: '').user,
+      initialData: [],
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: const Text(
+            "Profile",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
           ),
+          centerTitle: true,
+          backgroundColor: Colors.yellowAccent[400],
         ),
-        centerTitle: true,
-        backgroundColor: Colors.yellowAccent[400],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget> [
-            const SizedBox(height: 20.0,),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget> [
-                SizedBox(
-                  height: 100,
-                  width: 100,
-                  child: Icon(Icons.person),
-                ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: <Widget> [
+              UserList(),
+              const SizedBox(height: 20.0,),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget> [
+                  SizedBox(
+                    height: 100,
+                    width: 100,
+                    child: Icon(Icons.person),
+                  ),
+                  const SizedBox(width: 40.0,),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      //replace text with profile details
+                      Text(
+                        "Full Name: __________",
+                        textAlign: TextAlign.right,
+                      ),
+                      SizedBox(height: 10.0,),
+                      Text(
+                        "Email: __________",
+                        textAlign: TextAlign.right,
+                      ),
+                      SizedBox(height: 20.0,),
+                    ],
+                  ),
+                ],
 
-                /*
-                Image.network('https://www.tuktukdesign.com/wp-content/uploads/2021/03/person-icon.jpg',
-                  height: 100,
-                  width: 100,
-                ),
-                */
-
-
-                const SizedBox(width: 40.0,),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    //replace text with profile details
-                    Text(
-                      "Username: __________",
-                      textAlign: TextAlign.right,
-                    ),
-                    SizedBox(height: 10.0,),
-                    Text(
-                      "Phone: __________",
-                      textAlign: TextAlign.right,
-                    ),
-                    SizedBox(height: 10.0,),
-                    Text(
-                      "Country: __________",
-                      textAlign: TextAlign.right,
-                    ),
-                    SizedBox(height: 10.0,),
-                    Text(
-                      "Email: __________",
-                      textAlign: TextAlign.right,
-                    ),
-                    SizedBox(height: 20.0,),
-                  ],
-                ),
-              ],
-
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget> [
-                //put in if notifications are enabled or not
-                const Text("Notifications: "),
-                //for the notifications options
-                Switch(
-                  value: notifications,
-                  onChanged: (value) {
-                    setState(() {
-                      notifications = value;
-                    });
-                  },
-                  activeTrackColor: Colors.lightGreenAccent,
-                  activeColor: Colors.green,
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: const <Widget> [
-                SizedBox(
-                  width: 400,
-                  height: 200,
-                  child: Card(child: Text("Payment:"),),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget> [
-                RaisedButton(
-                  onPressed: () {
-                    //does something
-                  },
-                  child: const Text('Edit Profile'),
-                  color: Colors.blue,
-                ),
-              ],
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: RaisedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/');
-                },
-                child: const Text('Logout'),
-                color: Colors.blue,
               ),
-            ),
-          ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget> [
+                  //put in if notifications are enabled or not
+                  const Text("Notifications: "),
+                  //for the notifications options
+                  Switch(
+                    value: notifications,
+                    onChanged: (value) {
+                      setState(() {
+                        notifications = value;
+                      });
+                    },
+                    activeTrackColor: Colors.lightGreenAccent,
+                    activeColor: Colors.green,
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: const <Widget> [
+                  SizedBox(
+                    width: 400,
+                    height: 200,
+                    child: Card(child: Text("Payment:"),),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget> [
+                  RaisedButton(
+                    onPressed: () {
+                      //go to edit profile screen
+                      //Navigator.pushNamed(context, '/Edit Profile');
+                    },
+                    child: const Text('Edit Profile'),
+                    color: Colors.blue,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -272,8 +260,8 @@ class _GroupState extends State<Group> {
                   alignment: Alignment.bottomCenter,
                   child: RaisedButton(
                     onPressed: () {
-                      //go to create group page
-                      //Navigator.pushNamed(context, '/register');
+                      //go to create group screen
+                      Navigator.pushNamed(context, '/createGroup');
                     },
                     child: const Text('Create Group'),
                     color: Colors.blue,
