@@ -4,6 +4,8 @@ import 'package:split/Models/user.dart';
 import 'package:split/Screens/wrapper.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:split/Services/auth.dart';
+import 'package:split/Screens/Groups/Create Groups.dart';
+import 'package:split/Screens/Home/home.dart';
 
 
 
@@ -24,6 +26,10 @@ class MyApp extends StatelessWidget {
       value: AuthService().user,
         child: MaterialApp(
           home: Wrapper(),
+          routes: {
+            '/createGroup' : (context) => Create_Group(),
+            '/Group' : (context) => const Group(),
+          },
       ),
     );
   }
