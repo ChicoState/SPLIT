@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:split/shared/constants.dart';
 import 'package:split/Screens/wrapper.dart';
@@ -146,6 +147,17 @@ class _Create_GroupState extends State<Create_Group> {
                   print(payment1);
                   double total = calculate(payment1, memberNames.length);
                   print(total);
+                  FirebaseFirestore.instance.collection('Groups').add(
+                      {
+                        "groupName": groupName,
+                        "leaderName" : leaderName,
+                        "members" : memberNames,
+                        "paymentDate" : paymentDate,
+                        "totalPayment" : payment1,
+                        "splitPayment" : total,
+                      }).then((value){
+                        print(value.id);
+                  });
                   Navigator.defaultRouteName;
                   Navigator.pushNamed(context, '/Group');
                 },
