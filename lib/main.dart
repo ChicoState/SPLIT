@@ -6,7 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:split/Services/auth.dart';
 import 'package:split/Screens/Groups/Create Groups.dart';
 import 'package:split/Screens/Home/home.dart';
-
+import 'firebase_options.dart';
 
 
 void main() async {
