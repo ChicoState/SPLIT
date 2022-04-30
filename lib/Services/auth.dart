@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:split/Models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:split/Services/database.dart';
@@ -50,18 +51,28 @@ class AuthService{
   }
 
   //register with email and pass
-  Future registerWithEmailAndPassword(String email, String password, String name, bool notification) async{
+  Future registerWithEmailAndPassword(String email, String password, String name, String notification) async{
     try{
       UserCredential result = await _auth.createUserWithEmailAndPassword(email: email.trim(), password: password.trim());
       User? user = result.user;
       //create a new document for user with UID
-      await DataBaseService(uid: user!.uid).updateUserData(email, name, notification);
+      await DataBaseService(uid: user!.uid).updateUserData(email, name, notification, user!.uid);
       return _userfromFirebase(user);
     }on FirebaseAuthException catch(e){
       print(e.toString());
       return null;
       //return e.message;
     }
+  }
+
+//attempt to get current user information
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  Future currUser() async {
+    final User? user = auth.currentUser;
+    final uid = user?.uid;
+    final name = user?.displayName;
+    //DocumentSnapshot document = await Firestore.instance.collection(uid)
+    return uid.toString();
   }
 
   //sign out
