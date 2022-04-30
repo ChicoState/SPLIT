@@ -18,12 +18,16 @@ class _UserListState extends State<UserList> {
     final users = Provider.of<List<AppUser>>(context);
     //print(users.docs);
     users.forEach((user) {
-      print("name" + user.name);
-      print("email" + user.email);
-      print("uid" + user.uid);
+      print("name: " + user.name);
+      print("email: " + user.email);
+      print("uid: " + user.uid);
+      print("notification: " + user.notification.toString());
+
     });
 
 
-    return Container();
+    return Container(
+
+    );
   }
 }
