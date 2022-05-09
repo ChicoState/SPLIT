@@ -45,17 +45,14 @@ void main() {
     expect(find.text("Sign up to Split"), findsOneWidget);
   });
   */
-/*
-  testWidgets("test button", (WidgetTester tester) async {
-    await tester.pumpWidget(MyApp());
-    var button = find.text('Sign in');
+
+  testWidgets("test button", () {
+
     expect(button, findsOneWidget);
   });
-*/
 
-  testWidgets("find Signin to splitbutton", (WidgetTester tester) async {
 
-  });
+
 
 
 }

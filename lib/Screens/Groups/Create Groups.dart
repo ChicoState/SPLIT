@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:split/shared/constants.dart';
 import 'package:split/Screens/wrapper.dart';
@@ -87,11 +88,14 @@ class _Create_GroupState extends State<Create_Group> {
 
 
               TextFormField(
-                  decoration: textInputDecoration.copyWith(hintText: 'Member Name'),
+                  decoration: textInputDecoration.copyWith(hintText: 'Member Email'),
                   textInputAction: TextInputAction.next,
                   validator: (String?val){//making sure the email form is filled
-                    if(val != null && val.isEmpty){
+                    bool result = doesUserExist(val!) as bool;
+                    if(val.isEmpty){
                       return "Member Name can't be empty";
+                    } else if (result == false) {
+                      return "member does not exist";
                     }
                     return null;
                   },
@@ -147,6 +151,7 @@ class _Create_GroupState extends State<Create_Group> {
                   print(payment1);
                   double total = calculate(payment1, memberNames.length);
                   print(total);
+                  var docid;
                   FirebaseFirestore.instance.collection('Groups').add(
                       {
                         "groupName": groupName,
@@ -156,10 +161,21 @@ class _Create_GroupState extends State<Create_Group> {
                         "totalPayment" : payment1,
                         "splitPayment" : total,
                       }).then((value){
-                        print(value.id);
+                        print("value"+ value.id.toString());
+                        docid = value.id;
                   });
+                  await FirebaseFirestore.instance.collection('Groups').where(
+                    FieldPath.documentId,
+                        isEqualTo: docid
+                  ).get().then((event) {
+                    if (event.docs.isNotEmpty) {
+                      Map<String, dynamic> documentData = event.docs.single as Map<String, dynamic>;
+                    print(documentData['groupName']);
+                    }
+                  }).catchError((e) => print(e));
+
                   Navigator.defaultRouteName;
-                  Navigator.pushNamed(context, '/Group');
+                  Navigator.pop(context);
                 },
                 child: const Text(
                     "Create Group"),
