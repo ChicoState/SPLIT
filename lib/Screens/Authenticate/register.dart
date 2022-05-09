@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:split/Services/auth.dart';
 import 'package:split/shared/constants.dart';
 
@@ -22,6 +21,7 @@ class _RegisterState extends State<Register> {
   String password = '';
   String error = '';
   String fullName = '';
+  String username = '';
   bool notifications = false;
 
 
@@ -70,6 +70,19 @@ class _RegisterState extends State<Register> {
                       },
 
                       onChanged: (val){setState(() => fullName = val.trim());}
+                  ),
+                  const SizedBox(height: 20.0),
+                  TextFormField(
+                      decoration: textInputDecoration.copyWith(hintText: 'User Name'),
+                      keyboardType: TextInputType.name,
+                      textInputAction: TextInputAction.next,
+                      validator: (String?val){//making sure the email form is filled
+                        if(val != null && val.isEmpty){
+                          return "User name can't be empty";
+                        }
+                        return null;
+                      },
+                      onChanged: (val){setState(() => username = val.trim());}
                   ),
                   const SizedBox(height: 20.0),//Email stuff
                   TextFormField(
@@ -130,7 +143,7 @@ class _RegisterState extends State<Register> {
                         if(_formKey.currentState!.validate()){
                           //loading screen
                           setState(() => loading = true);
-                          dynamic result = await _auth.registerWithEmailAndPassword(email.trim(), password.trim(), fullName.trim(), notifications.toString().trim());
+                          dynamic result = await _auth.registerWithEmailAndPassword(email.trim(), password.trim(), fullName.trim(), username.trim(), notifications.toString().trim());
                           if(result == null){
                             setState(() {
                               error = 'Please supply a valid email';

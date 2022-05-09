@@ -1,37 +1,38 @@
-// This is a basic Flutter widget test.
+// import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 //
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility that Flutter provides. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
+// void main() {
+//   final instance = FakeFirebaseFirestore();
+//   await instance.collection('users').add({
+//     'username': 'Bob',
+//   });
+//   final snapshot = await instance.collection('users').get();
+//   print(snapshot.docs.length); // 1
+//   print(snapshot.docs.first.get('username')); // 'Bob'
+//   print(instance.dump());
+// }
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:split/Screens/Home/home.dart';
 
-import 'package:split/main.dart';
-import 'package:split/Screens/Authenticate/sign_in.dart';
-import 'package:split/Screens/Authenticate/sign_in.dart';
-
-void main() {
-  /*
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
-
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+// this the test for making group in the firestore cloud
+void main()  {
+  testWidgets('Check if firestore works', (WidgetTester tester) async {
+    final instance = FakeFirebaseFirestore();
+    final List<String> memberNames = [];
+    memberNames.add('Jonathan');
+    memberNames.add('Alex');
+    memberNames.add('Wataru');
+    memberNames.add('Dylan');
+    await instance.collection('Groups').add({
+      'groupName': 'group1 ',
+      'leaderName': 'Javier',
+      'members': memberNames
+    });
+    final snapshot =  await instance.collection('Groups').get();
+    print(snapshot.docs.length); // 1
+    print(snapshot.docs.first.get('Groups'));
+    print(instance.dump());
   });
+<<<<<<< HEAD
 */
   /*
   testWidgets("test email", (WidgetTester tester) async {
@@ -56,3 +57,6 @@ void main() {
 
 
 }
+=======
+}
+>>>>>>> d6256f75d083931bb48aef1d4ec0fdb043517551
