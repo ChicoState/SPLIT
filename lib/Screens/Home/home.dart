@@ -1,18 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:split/Models/user.dart';
 import 'package:split/Services/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:split/Services/database.dart';
-//import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:split/Screens/Groups/Create Groups.dart';
+// import 'package:split/Screens/Groups/Create Groups.dart';
+// import 'package:split/Screens/Groups/gotoGroup.dart';
 import 'package:split/Services/database.dart';
 import 'package:split/Screens/Home/users_list.dart';
 import 'package:split/Models/appUser.dart';
-
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../../Models/appUser.dart';
 
-
+final FirebaseAuth auth = FirebaseAuth.instance;
+final User user = auth.currentUser!;
 
 class Home extends StatelessWidget {
 
@@ -20,6 +22,9 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String _username="";
+    String _uid = user.uid.toString();
+
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -28,7 +33,7 @@ class Home extends StatelessWidget {
           backgroundColor: Colors.yellow,
           elevation: 0.0,
           actions: <Widget>[
-            FlatButton.icon(
+            TextButton.icon(
               icon: Icon(Icons.person),
               label: Text('logout'),
               onPressed: ()async{
@@ -37,6 +42,7 @@ class Home extends StatelessWidget {
             )
           ],
         ),
+
         body: TabBarView(
           children: [
             Container(
@@ -83,7 +89,7 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   bool notifications = false;
-  String name = '';
+  // String
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -201,7 +207,8 @@ class _GroupState extends State<Group> {
   // This widget is the root of your application.
 
   final groupvalueHolder = TextEditingController();
-
+  //need to have the size of groups below
+  List<int> text = [1,2,3,4];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -238,7 +245,7 @@ class _GroupState extends State<Group> {
                 //put the list of groups here???
                 SizedBox(
                   width: 400,
-                  height: 400,
+                  height: 30,
                   child: Card(
                     child: Text(
                       'Group List:',
@@ -254,25 +261,43 @@ class _GroupState extends State<Group> {
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget> [
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: RaisedButton(
-                    onPressed: () {
-                      //go to create group screen
-                      Navigator.pushNamed(context, '/createGroup');
-                    },
-                    child: const Text('Create Group'),
-                    color: Colors.blue,
-                  ),
-                ),
+              children: [
+                GroupList()
               ],
             ),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            //   crossAxisAlignment: CrossAxisAlignment.end,
+            //   children: <Widget> [
+            //     Align(
+            //       alignment: Alignment.bottomCenter,
+            //       child: RaisedButton(
+            //         onPressed: () {
+            //           //go to create group screen
+            //           Navigator.pushNamed(context, '/createGroup');
+            //         },
+            //         child: const Text('Create Group'),
+            //         color: Colors.blue,
+            //       ),
+            //     ),
+            //   ],
+            // ),
+
           ],
+
         ),
+
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.pushNamed(context, '/createGroup');
+        },
+        backgroundColor: Colors.green,
+        icon: const Icon(Icons.add),
+        label: const Text('Create'),
       ),
     );
+
 
   }
 }
@@ -283,6 +308,11 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeState();
 }
+
+
+
+
+
 
 class _HomeState extends State<HomeScreen> {
 
@@ -321,8 +351,20 @@ class _HomeState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget> [
-            Text("Placeholder Calendar"),
-            //placeholder calendar.  Should replace with google calendar
+                SizedBox(
+                  height: 500,
+                  width: 500,
+                  child: SfCalendar(
+                    view: CalendarView.month,
+                    initialSelectedDate: DateTime.now(),
+                    dataSource: MeetingDataSource(_getDataSource()),
+                    monthViewSettings: MonthViewSettings(
+                        appointmentDisplayMode: MonthAppointmentDisplayMode.appointment),
+
+                  ),
+                ),
+
+                    //placeholder calendar.  Should replace with google calendar
 
             // TableCalendar(
             //   firstDay: DateTime.utc(2010, 10, 16),
@@ -364,4 +406,157 @@ class _HomeState extends State<HomeScreen> {
       ),
     );
   }
+}
+
+// calender sample --------------------------
+class Meeting {
+  Meeting(this.eventName, this.from, this.to, this.background, this.isAllDay);
+
+  String eventName;
+  DateTime from;
+  DateTime to;
+  Color background;
+  bool isAllDay;
+}
+
+List<Meeting> _getDataSource() {
+  final List<Meeting> meetings = <Meeting>[];
+  final DateTime today = DateTime.now();
+  final DateTime startTime =
+  DateTime(today.year, today.month, today.day, 9, 0, 0);
+  final DateTime endTime = startTime.add(const Duration(hours: 2));
+  meetings.add(Meeting(
+      'Payment', startTime, endTime, const Color(0xFF0F8644), false));
+  return meetings;
+}
+
+class MeetingDataSource extends CalendarDataSource {
+  MeetingDataSource(List<Meeting> source) {
+    appointments = source;
+  }
+
+  @override
+  DateTime getStartTime(int index) {
+    return appointments![index].from;
+  }
+
+  @override
+  DateTime getEndTime(int index) {
+    return appointments![index].to;
+  }
+
+  @override
+  String getSubject(int index) {
+    return appointments![index].eventName;
+  }
+
+  @override
+  Color getColor(int index) {
+    return appointments![index].background;
+  }
+
+  @override
+  bool isAllDay(int index) {
+    return appointments![index].isAllDay;
+  }
+}
+
+//----------------------------- calender sample----------------------------
+
+
+
+
+
+
+
+class GroupList extends StatelessWidget{
+
+
+  @override
+  Widget build(BuildContext context){
+    final Stream<QuerySnapshot> dataStream = FirebaseFirestore.instance.collection('Groups').snapshots();
+    return Container(
+        child: Column(
+          children: [
+            StreamBuilder<QuerySnapshot>(
+              stream: dataStream,
+              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot){
+                if (snapshot.hasError){
+                  //ToDO add snapbar
+                }
+                if(snapshot.connectionState==ConnectionState.waiting){
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                final List storedocs =[];
+                snapshot.data!.docs.map((DocumentSnapshot document){
+                  Map a = document.data() as Map<String, dynamic>;
+                  storedocs.add(a);
+                  // print(a.toString());
+                }).toList();
+
+
+                return Column(
+
+                  children: List.generate(
+                      storedocs.length,
+                          (i)=>Container(
+
+                            padding: EdgeInsets.all(5),
+                            // margin: EdgeInsets.all(5),
+
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                    context,
+                                  '/gotoGroup',
+                                  arguments: GroupArguments (storedocs[i])
+                                );
+                              },
+                            child: Column(
+                        children: [
+                            Text( 'Group name: ' + storedocs[i]['groupName']
+                            ),
+                            const SizedBox(height:10, width: 200,),
+                            Text(
+                                'Leader name: ' + storedocs[i]['leaderName']
+                            )
+                        ],
+                      ),
+                            ),
+                            )
+                  ),
+                );
+              },
+            )
+          ],
+        ),
+      );
+    // return Container(
+    //   child: ElevatedButton(
+    //     onPressed: () {
+    //       Navigator.pushNamed(context, '/gotoGroup');
+    //       },
+    //     child: Container(
+    //       width: 100,
+    //       // height: 50,
+    //       child: Column(
+    //         mainAxisAlignment: MainAxisAlignment.center,
+    //         children: [
+    //           Text("Group1"),
+    //           Icon(Icons.person),
+    //         ],
+    //       ),
+    //     ),
+    //   ),
+    // );
+  }
+}
+
+class GroupArguments {
+  final Map groupid;
+
+  GroupArguments(this.groupid);
 }
