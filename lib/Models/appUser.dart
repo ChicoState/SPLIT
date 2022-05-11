@@ -4,6 +4,6 @@ class AppUser {
   final String username;
   final String email;
   final String notification;
-  String groupId;
-  AppUser({required this.uid, required this.name, required this.username, required this.email, required this.notification, required this.groupId});
+  final List groups;
+  AppUser({required this.uid, required this.name, required this.username, required this.email, required this.groups, required this.notification});
 }

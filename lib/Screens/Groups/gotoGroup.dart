@@ -1,12 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firestore_cache/firestore_cache.dart';
-import 'package:split/shared/constants.dart';
-import 'package:split/Screens/wrapper.dart';
-import 'package:split/Services/database.dart';
-import 'package:split/Screens/Home/home.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../../Models/appUser.dart';
+import 'package:split/Screens/Home/group.dart';
 
 
 // class Goto_group extends StatefulWidget {
@@ -28,7 +22,7 @@ class Goto_group extends StatelessWidget {
     final String leaderName = arguments.groupid["leaderName"];
     final List members = arguments.groupid["members"];
     final double splitPayment = arguments.groupid["splitPayment"];
-    final String paymentDate = arguments.groupid["paymentDate"];
+    final DateTime paymentDate = arguments.groupid["paymentDate"].toDate();
 
     final Stream<QuerySnapshot> dataStream = FirebaseFirestore.instance.collection('Groups').snapshots();
     return Scaffold(
@@ -89,7 +83,7 @@ class Goto_group extends StatelessWidget {
                     padding: const EdgeInsets.all(20),
                     margin: EdgeInsets.all(20),
                     color: Colors.grey,
-                    child:   Text("paymentDate: " + paymentDate)
+                    child:   Text("paymentDate: " + paymentDate.toString())
                 ),
 
           ],
