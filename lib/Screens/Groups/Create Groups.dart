@@ -1,8 +1,35 @@
+//import 'dart:html';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:split/shared/constants.dart';
-import 'package:split/Screens/wrapper.dart';
+//import 'package:split/Screens/wrapper.dart';
+
+
+//variables
+List<String> memberNames = [];
+
+double calculate(double payment, int members) {
+  double split = 0.00;
+  if(payment == 0.0) {
+    return split;
+  } else if (members == 0) {
+    return payment;
+  } else {
+    split = payment / members;
+    return split;
+  }
+}
+
+void addnames(List<String> memberNames, String memberName) {
+  String name = memberName;
+  if (name == '') {
+    print("empty");
+  } else {
+    memberNames.add(memberName);
+    print(memberName);
+  }
+}
 
 
 class Create_Group extends StatefulWidget {
@@ -12,8 +39,9 @@ class Create_Group extends StatefulWidget {
 
 class _Create_GroupState extends State<Create_Group> {
   final fieldText = TextEditingController();
+
   //variables
-  final List<String> memberNames = [];
+  //final List<String> memberNames = [];
   String add_check = '';
   String groupName = '';
   String leaderName = '';
@@ -22,6 +50,7 @@ class _Create_GroupState extends State<Create_Group> {
   var paymentDate = '';
   var groupCreation = '';
 
+/*
   double calculate(double payment, int members) {
     double split = 0.00;
     split = payment / members;
@@ -37,7 +66,7 @@ class _Create_GroupState extends State<Create_Group> {
       print(memberName);
     }
   }
-
+  */
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,32 +118,9 @@ class _Create_GroupState extends State<Create_Group> {
                     }
                     return null;
                   },
-<<<<<<< HEAD
-                  onChanged: (val){setState(() => leaderName = val.trim());}
-              ),
-
-              const SizedBox(height: 20.0),//Member Name stuff
-
-
-              TextFormField(
-                  decoration: textInputDecoration.copyWith(hintText: 'Member Email'),
-                  textInputAction: TextInputAction.next,
-                  validator: (String?val){//making sure the email form is filled
-                    bool result = doesUserExist(val!) as bool;
-                    if(val.isEmpty){
-                      return "Member Name can't be empty";
-                    } else if (result == false) {
-                      return "member does not exist";
-                    }
-                    return null;
-                  },
-                  onChanged: (val) async {
-                    setState(() => memberName = val.trim());
-                    //addnames(memberName);
-=======
                   onChanged: (val) {
-                    setState(() => leaderName = val.trim());
->>>>>>> d6256f75d083931bb48aef1d4ec0fdb043517551
+                    setState(() => leaderName = val.trim(),
+                    );
                   }
               ),
 
@@ -124,20 +130,20 @@ class _Create_GroupState extends State<Create_Group> {
                 children: [
                   Container(
                     child: TextFormField(
-                        decoration: textInputDecoration.copyWith(
-                            hintText: 'Member Name'),
-                        textInputAction: TextInputAction.next,
-                        validator: (
-                            String?val) { //making sure the email form is filled
-                          if (val != null && val.isEmpty) {
-                            return "Member Name can't be empty";
-                          }
-                          return null;
-                        },
-                        onChanged: (val) async {
-                          setState(() => memberName = val.trim());
-                          //addnames(memberName);
-                        },
+                      decoration: textInputDecoration.copyWith(
+                          hintText: 'Member Name'),
+                      textInputAction: TextInputAction.next,
+                      validator: (
+                          String?val) { //making sure the email form is filled
+                        if (val != null && val.isEmpty) {
+                          return "Member Name can't be empty";
+                        }
+                        return null;
+                      },
+                      onChanged: (val) async {
+                        setState(() => memberName = val.trim());
+                        //addnames(memberName);
+                      },
                       controller: fieldText,
                     ),
 
@@ -145,7 +151,7 @@ class _Create_GroupState extends State<Create_Group> {
                   SizedBox(height: 15,),
                   RaisedButton(
                     onPressed: () async {
-                        clearText(memberName);
+                      clearText(memberName);
                     },
                     color: Colors.green,
                     child: Text('add'),
@@ -208,20 +214,9 @@ class _Create_GroupState extends State<Create_Group> {
                   print(payment1);
                   double total = calculate(payment1, memberNames.length);
                   print(total);
-                  var docid;
                   FirebaseFirestore.instance.collection('Groups').add(
                       {
                         "groupName": groupName,
-<<<<<<< HEAD
-                        "leaderName" : leaderName,
-                        "members" : memberNames,
-                        "paymentDate" : paymentDate,
-                        "totalPayment" : payment1,
-                        "splitPayment" : total,
-                      }).then((value){
-                        print("value"+ value.id.toString());
-                        docid = value.id;
-=======
                         "leaderName": leaderName,
                         "members": memberNames,
                         "paymentDate": paymentDate,
@@ -229,20 +224,10 @@ class _Create_GroupState extends State<Create_Group> {
                         "splitPayment": total,
                       }).then((value) {
                     print(value.id);
->>>>>>> d6256f75d083931bb48aef1d4ec0fdb043517551
+                    empty_list();
                   });
-                  await FirebaseFirestore.instance.collection('Groups').where(
-                    FieldPath.documentId,
-                        isEqualTo: docid
-                  ).get().then((event) {
-                    if (event.docs.isNotEmpty) {
-                      Map<String, dynamic> documentData = event.docs.single as Map<String, dynamic>;
-                    print(documentData['groupName']);
-                    }
-                  }).catchError((e) => print(e));
-
                   Navigator.defaultRouteName;
-                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/Group');
                 },
                 child: const Text(
                     "Create Group"),
@@ -253,13 +238,14 @@ class _Create_GroupState extends State<Create_Group> {
       ),
     );
   }
-
+void empty_list() {
+  memberNames.clear();
+}
   void clearText(String _m) {
-    addnames(_m);
+    addnames(memberNames, _m);
     add_check = "added";
     fieldText.clear();
 
   }
 
 }
-
