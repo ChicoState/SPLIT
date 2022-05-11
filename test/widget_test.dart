@@ -32,4 +32,27 @@ void main()  {
     print(snapshot.docs.first.get('Groups'));
     print(instance.dump());
   });
+
+
+  testWidgets('Check if users are being created', (WidgetTester tester) async {
+    final instance = FakeFirebaseFirestore();
+    String email = "123@gmail.com";
+    String uid1 = "123akhfkjsahfd";
+    String name = "Bill Nye";
+    String username = name;
+    String notification = "True";
+
+    await instance.collection('User').add({
+      'email' : email,
+      'name': name,
+      'username': username,
+      'notification' : notification,
+      'uid' : uid1,
+    });
+    final snapshot =  await instance.collection('User').get();
+    print(snapshot.docs.length); // 1
+    print(snapshot.docs.first.get('User'));
+    print(instance.dump());
+  });
+
 }

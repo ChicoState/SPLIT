@@ -55,7 +55,7 @@ class AuthService{
     try{
       UserCredential result = await _auth.createUserWithEmailAndPassword(email: email.trim(), password: password.trim());
       User? user = result.user;
-      //create a new document for user with UID
+      //create a new document for user with UID1
       await DataBaseService(uid: user!.uid).updateUserData(email, name, username, notification, user!.uid);
       return _userfromFirebase(user);
     }on FirebaseAuthException catch(e){
@@ -65,6 +65,7 @@ class AuthService{
     }
   }
 
+  //Can maybe delete, not used yet
 //attempt to get current user information
   final FirebaseAuth auth = FirebaseAuth.instance;
   Future currUser() async {

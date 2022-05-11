@@ -1,7 +1,35 @@
+//import 'dart:html';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:split/shared/constants.dart';
-import 'package:split/Screens/wrapper.dart';
+//import 'package:split/Screens/wrapper.dart';
+
+
+//variables
+List<String> memberNames = [];
+
+double calculate(double payment, int members) {
+  double split = 0.00;
+  if(payment == 0.0) {
+    return split;
+  } else if (members == 0) {
+    return payment;
+  } else {
+    split = payment / members;
+    return split;
+  }
+}
+
+void addnames(List<String> memberNames, String memberName) {
+  String name = memberName;
+  if (name == '') {
+    print("empty");
+  } else {
+    memberNames.add(memberName);
+    print(memberName);
+  }
+}
 
 
 class Create_Group extends StatefulWidget {
@@ -11,8 +39,9 @@ class Create_Group extends StatefulWidget {
 
 class _Create_GroupState extends State<Create_Group> {
   final fieldText = TextEditingController();
+
   //variables
-  final List<String> memberNames = [];
+  //final List<String> memberNames = [];
   String add_check = '';
   String groupName = '';
   String leaderName = '';
@@ -21,6 +50,7 @@ class _Create_GroupState extends State<Create_Group> {
   var paymentDate = '';
   var groupCreation = '';
 
+/*
   double calculate(double payment, int members) {
     double split = 0.00;
     split = payment / members;
@@ -36,7 +66,7 @@ class _Create_GroupState extends State<Create_Group> {
       print(memberName);
     }
   }
-
+  */
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,7 +119,8 @@ class _Create_GroupState extends State<Create_Group> {
                     return null;
                   },
                   onChanged: (val) {
-                    setState(() => leaderName = val.trim());
+                    setState(() => leaderName = val.trim(),
+                    );
                   }
               ),
 
@@ -99,20 +130,20 @@ class _Create_GroupState extends State<Create_Group> {
                 children: [
                   Container(
                     child: TextFormField(
-                        decoration: textInputDecoration.copyWith(
-                            hintText: 'Member Name'),
-                        textInputAction: TextInputAction.next,
-                        validator: (
-                            String?val) { //making sure the email form is filled
-                          if (val != null && val.isEmpty) {
-                            return "Member Name can't be empty";
-                          }
-                          return null;
-                        },
-                        onChanged: (val) async {
-                          setState(() => memberName = val.trim());
-                          //addnames(memberName);
-                        },
+                      decoration: textInputDecoration.copyWith(
+                          hintText: 'Member Name'),
+                      textInputAction: TextInputAction.next,
+                      validator: (
+                          String?val) { //making sure the email form is filled
+                        if (val != null && val.isEmpty) {
+                          return "Member Name can't be empty";
+                        }
+                        return null;
+                      },
+                      onChanged: (val) async {
+                        setState(() => memberName = val.trim());
+                        //addnames(memberName);
+                      },
                       controller: fieldText,
                     ),
 
@@ -120,7 +151,7 @@ class _Create_GroupState extends State<Create_Group> {
                   SizedBox(height: 15,),
                   RaisedButton(
                     onPressed: () async {
-                        clearText(memberName);
+                      clearText(memberName);
                     },
                     color: Colors.green,
                     child: Text('add'),
@@ -193,6 +224,7 @@ class _Create_GroupState extends State<Create_Group> {
                         "splitPayment": total,
                       }).then((value) {
                     print(value.id);
+                    empty_list();
                   });
                   Navigator.defaultRouteName;
                   Navigator.pushNamed(context, '/Group');
@@ -206,13 +238,14 @@ class _Create_GroupState extends State<Create_Group> {
       ),
     );
   }
-
+void empty_list() {
+  memberNames.clear();
+}
   void clearText(String _m) {
-    addnames(_m);
+    addnames(memberNames, _m);
     add_check = "added";
     fieldText.clear();
 
   }
 
 }
-
