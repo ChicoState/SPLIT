@@ -63,6 +63,7 @@ class AuthService{
     }
   }
 
+  //Can maybe delete, not used yet
 //attempt to get current user information
   final FirebaseAuth auth = FirebaseAuth.instance;
   Future currUser() async {

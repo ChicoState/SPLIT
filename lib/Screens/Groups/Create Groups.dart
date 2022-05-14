@@ -1,8 +1,11 @@
+//import 'dart:html';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:split/shared/constants.dart';
 import 'package:split/Screens/wrapper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 
 final FirebaseAuth auth = FirebaseAuth.instance;
 final User user = auth.currentUser!;
@@ -16,8 +19,11 @@ class _Create_GroupState extends State<Create_Group> {
 
   final String _uid = user.uid.toString();
   final fieldText = TextEditingController();
+
   //variables
+
   final List memberNames = [];
+
   String add_check = '';
   String groupName = '';
   String leaderName = '';
@@ -26,6 +32,7 @@ class _Create_GroupState extends State<Create_Group> {
   DateTime paymentDate = DateTime.now();
   var groupCreation = '';
 
+/*
   double calculate(double payment, int members) {
     double split = 0.00;
     split = payment / members;
@@ -56,7 +63,6 @@ class _Create_GroupState extends State<Create_Group> {
       });
     }
   }
-
 
 
   @override
@@ -112,13 +118,15 @@ class _Create_GroupState extends State<Create_Group> {
                     return null;
                   },
                   onChanged: (val) {
-                    setState(() => leaderName = val.trim());
+                    setState(() => leaderName = val.trim(),
+                    );
                   }
               ),
 
 
               const SizedBox(height: 20.0), //Member Name stuff
               Column(
+
 
                 children: List.generate(5, (index) => Container(
                   padding: EdgeInsets.all(3),
@@ -132,6 +140,7 @@ class _Create_GroupState extends State<Create_Group> {
                         return "Member Name can't be empty";
                       }
                       return null;
+
                     },
                     onChanged: (val) async {
                       setState(() => _memberName[index] = val.trim());
@@ -207,9 +216,11 @@ class _Create_GroupState extends State<Create_Group> {
                           }
                         );
                     print(value.id);
+
                         FirebaseFirestore.instance.collection("Groups").doc(value.id).update({
                             "groupid": value.id
                         });
+
                   });
                   // her you have to get the group id from the firebase database to store the id to the user
                   //it should be a list which means you can add any group
@@ -229,4 +240,3 @@ class _Create_GroupState extends State<Create_Group> {
 
 
 }
-
