@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
+import 'package:pay/pay.dart';
 import 'package:split/Screens/Home/group.dart';
 
 
@@ -27,6 +27,13 @@ class Goto_group extends StatelessWidget {
     final DateTime paymentDate = arguments.groupid["paymentDate"].toDate();
     final Stream<QuerySnapshot> dataStream =
         FirebaseFirestore.instance.collection('Groups').snapshots();
+    final _paymentItems = [
+      PaymentItem(
+        label: 'Total',
+        amount: '1.00',
+        status: PaymentItemStatus.final_price,
+      )
+    ];
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -94,7 +101,7 @@ class Goto_group extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 margin: EdgeInsets.all(20),
                 color: Colors.grey,
-                child: Text("paymentDate: " + paymentDate)),
+                child: Text("paymentDate: " + paymentDate.toString())),
             //add another button to pay my share of the group, that goes to gotoPay.dart file when pressed
             GooglePayButton(
               width: 300,

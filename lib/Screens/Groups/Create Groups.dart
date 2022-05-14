@@ -32,7 +32,7 @@ class _Create_GroupState extends State<Create_Group> {
   DateTime paymentDate = DateTime.now();
   var groupCreation = '';
 
-/*
+
   double calculate(double payment, int members) {
     double split = 0.00;
     split = payment / members;
