@@ -74,6 +74,43 @@ class AuthService{
     return uid.toString();
   }
 
+
+ //create future for email
+  Future getUserEmail() async {
+    FirebaseAuth _auth = FirebaseAuth.instance;
+    final User? user = _auth.currentUser;
+    return user?.email;
+  }
+
+  //return the current display name
+  String currUserName() {
+    final User? user = _auth.currentUser;
+    //
+    if (user != null) {
+      return user.displayName.toString();
+    } else {
+      return "cannot get user";
+    }
+  }
+
+
+  Future updateUser(
+      String email, String name, String username, List groups, List payments, notification) async {
+    final User? user = _auth.currentUser;
+    //print user info
+    if (user != null) {
+      print(user.uid);
+      print(user.email);
+      print(user.displayName);
+    }
+    if (user != null) {
+      await DataBaseService(uid: user.uid)
+          .updateUserData(email, name, username, groups, payments, notification);
+    } else {
+      return "cannot get user";
+    }
+  }
+
   //sign out
   Future signOut() async{
       try{
