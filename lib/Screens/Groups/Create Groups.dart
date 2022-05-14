@@ -1,29 +1,41 @@
-//import 'dart:html';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:split/shared/constants.dart';
 import 'package:split/Screens/wrapper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
-
 final FirebaseAuth auth = FirebaseAuth.instance;
 final User user = auth.currentUser!;
-
+//variables
+List<String> memberNames = [];
+double calculate(double payment, int members) {
+  double split = 0.00;
+  if(payment == 0.0) {
+    return split;
+  } else if (members == 0) {
+    return payment;
+  } else {
+    split = payment / members;
+    return split;
+  }
+}
+void addnames(List<String> memberNames, String memberName) {
+  String name = memberName;
+  if (name == '') {
+    print("empty");
+  } else {
+    memberNames.add(memberName);
+    print(memberName);
+  }
+}
 class Create_Group extends StatefulWidget {
   @override
   State<Create_Group> createState() => _Create_GroupState();
 }
-
 class _Create_GroupState extends State<Create_Group> {
-
   final String _uid = user.uid.toString();
   final fieldText = TextEditingController();
-
   //variables
-
-  final List memberNames = [];
-
+  //final List memberNames = [];
   String add_check = '';
   String groupName = '';
   String leaderName = '';
@@ -31,26 +43,23 @@ class _Create_GroupState extends State<Create_Group> {
   String payment = '';
   DateTime paymentDate = DateTime.now();
   var groupCreation = '';
-
-
-  double calculate(double payment, int members) {
-    double split = 0.00;
-    split = payment / members;
-    return split;
+/*
+ double calculate(double payment, int members) {
+  double split = 0.00;
+  split = payment / members;
+  return split;
+ }
+ void addnames(String memberName) {
+  String name = memberName;
+  if (name == '') {
+   print("empty");
+  } else {
+   memberNames.add(memberName);
+   print(memberName);
   }
-
-  void addnames(String memberName) {
-    String name = memberName;
-    if (name == '') {
-      print("empty");
-    } else {
-      memberNames.add(memberName);
-      print(memberName);
-    }
-  }
-
+ }
+*/
   // DateTime selectedDate = DateTime.now();
-
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
         context: context,
@@ -63,8 +72,6 @@ class _Create_GroupState extends State<Create_Group> {
       });
     }
   }
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,7 +111,6 @@ class _Create_GroupState extends State<Create_Group> {
                     setState(() => groupName = val.trim());
                   }
               ),
-
               const SizedBox(height: 20.0), //Group Leader Name stuff
               TextFormField(
                   decoration: textInputDecoration.copyWith(
@@ -122,12 +128,8 @@ class _Create_GroupState extends State<Create_Group> {
                     );
                   }
               ),
-
-
               const SizedBox(height: 20.0), //Member Name stuff
               Column(
-
-
                 children: List.generate(5, (index) => Container(
                   padding: EdgeInsets.all(3),
                   child: TextFormField(
@@ -140,7 +142,6 @@ class _Create_GroupState extends State<Create_Group> {
                         return "Member Name can't be empty";
                       }
                       return null;
-
                     },
                     onChanged: (val) async {
                       setState(() => _memberName[index] = val.trim());
@@ -150,21 +151,17 @@ class _Create_GroupState extends State<Create_Group> {
                   ),
                 ),
                 ),
-
-
               ),
               Text("${paymentDate.toLocal()}".split(' ')[0],
-
-                  style: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                  foreground: Paint()..shader),
+                style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                    foreground: Paint()..shader),
               ),
               SizedBox(height: 20.0,),
               ElevatedButton(
                 onPressed: () => _selectDate(context),
                 child: Text('Select date'),
-
               ),
               const SizedBox(height: 20.0), //Payment Amount stuff
               TextFormField(
@@ -188,7 +185,7 @@ class _Create_GroupState extends State<Create_Group> {
                   DateTime now = DateTime.now();
                   var payment1 = double.parse(payment);
                   for(int i=0;i<_memberName.length;i++){
-                    addnames(_memberName[i]);
+                    addnames(memberNames, _memberName[i]);
                   }
                   print(now);
                   print(groupName);
@@ -208,19 +205,16 @@ class _Create_GroupState extends State<Create_Group> {
                         "splitPayment": total,
                         "groupid": "",
                       }).then((value) {
-                        FirebaseFirestore.instance.collection("User").doc(_uid).update(
-                          {
-
-                            "Groups": FieldValue.arrayUnion([value.id]),
-                            "payments": FieldValue.arrayUnion([paymentDate]),
-                          }
-                        );
+                    FirebaseFirestore.instance.collection("User").doc(_uid).update(
+                        {
+                          "Groups": FieldValue.arrayUnion([value.id]),
+                          "payments": FieldValue.arrayUnion([paymentDate]),
+                        }
+                    );
                     print(value.id);
-
-                        FirebaseFirestore.instance.collection("Groups").doc(value.id).update({
-                            "groupid": value.id
-                        });
-
+                    FirebaseFirestore.instance.collection("Groups").doc(value.id).update({
+                      "groupid": value.id
+                    });
                   });
                   // her you have to get the group id from the firebase database to store the id to the user
                   //it should be a list which means you can add any group
@@ -236,7 +230,4 @@ class _Create_GroupState extends State<Create_Group> {
       ),
     );
   }
-
-
-
 }
