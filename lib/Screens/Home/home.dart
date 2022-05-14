@@ -13,16 +13,14 @@ import 'package:split/Models/appUser.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../../Models/appUser.dart';
 
-final FirebaseAuth auth = FirebaseAuth.instance;
-final User user = auth.currentUser!;
+FirebaseAuth auth = FirebaseAuth.instance;
+User user = auth.currentUser!;
+AuthService _auth = AuthService();
 
 class Home extends StatelessWidget {
-
-  final AuthService _auth = AuthService();
-
   @override
   Widget build(BuildContext context) {
-    String _username="";
+    String _username = "";
     String _uid = user.uid.toString();
 
     return DefaultTabController(
@@ -36,13 +34,12 @@ class Home extends StatelessWidget {
             TextButton.icon(
               icon: Icon(Icons.person),
               label: Text('logout'),
-              onPressed: ()async{
+              onPressed: () async {
                 await _auth.signOut();
               },
             )
           ],
         ),
-
         body: TabBarView(
           children: [
             Container(
@@ -72,13 +69,11 @@ class Home extends StatelessWidget {
             unselectedLabelColor: Colors.black38,
             indicatorSize: TabBarIndicatorSize.label,
             indicatorPadding: EdgeInsets.all(5.0),
-            indicatorColor: Theme.of(context).primaryColor
-        ),
+            indicatorColor: Theme.of(context).primaryColor),
       ),
     );
   }
 }
-
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -88,7 +83,53 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  String email = '';
+  String password = '';
+  String error = '';
+  String fullName = '';
+  String username = '';
   bool notifications = false;
+  User user = auth.currentUser!;
+  AuthService _auth = AuthService();
+
+  //create a future builder to get the user data from Future<String?> currUser()
+  Widget _buildFutureBuilder() {
+    return FutureBuilder(
+      future: _auth.currUser(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return Column(
+            children: <Widget>[
+              Text(snapshot.data != null ? snapshot.data.toString() : ""),
+            ],
+          );
+        } else if (snapshot.hasError) {
+          return Text("${snapshot.error}");
+        }
+        return CircularProgressIndicator();
+      },
+    );
+  }
+
+  //future builder for getUserEmail()
+  Widget _buildFutureBuilderEmail() {
+    return FutureBuilder(
+      future: _auth.getUserEmail(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return Column(
+            children: <Widget>[
+              Text(snapshot.data != null ? snapshot.data.toString() : ""),
+            ],
+          );
+        } else if (snapshot.hasError) {
+          return Text("${snapshot.error}");
+        }
+        return CircularProgressIndicator();
+      },
+    );
+  }
+
   // String
   // This widget is the root of your application.
   @override
@@ -110,43 +151,51 @@ class _ProfileState extends State<Profile> {
         ),
         body: SingleChildScrollView(
           child: Column(
-            children: <Widget> [
+            children: <Widget>[
               UserList(),
-              const SizedBox(height: 20.0,),
+              const SizedBox(
+                height: 20.0,
+              ),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget> [
+                children: <Widget>[
                   SizedBox(
                     height: 100,
                     width: 100,
                     child: Icon(Icons.person),
                   ),
-                  const SizedBox(width: 40.0,),
+                  const SizedBox(
+                    width: 40.0,
+                  ),
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       //replace text with profile details
+                      //create
                       Text(
-                        "Full Name: __________",
+                        "Full Name: " + _auth.currUser().toString(),
                         textAlign: TextAlign.right,
                       ),
-                      SizedBox(height: 10.0,),
+                      SizedBox(
+                        height: 10.0,
+                      ),
                       Text(
-                        "Email: __________",
+                        "Email: " + _auth.getUserEmail().toString(),
                         textAlign: TextAlign.right,
                       ),
-                      SizedBox(height: 20.0,),
+                      SizedBox(
+                        height: 20.0,
+                      ),
                     ],
                   ),
                 ],
-
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget> [
+                children: <Widget>[
                   //put in if notifications are enabled or not
                   const Text("Notifications: "),
                   //for the notifications options
@@ -162,31 +211,126 @@ class _ProfileState extends State<Profile> {
                   ),
                 ],
               ),
+              //New row with text forms to change email, name, username, and notification settings
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: const <Widget> [
+                children: <Widget>[
                   SizedBox(
-                    width: 400,
-                    height: 200,
-                    child: Card(child: Text("Payment:"),),
+                    width: 350,
+                    height: 50,
+                    child: Card(
+                      child: TextFormField(
+                          decoration: InputDecoration(
+                            labelText: 'Email',
+                            border: OutlineInputBorder(),
+                          ),
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
+                          validator: (String? val) {
+                            //making sure the email form is filled
+                            if (val != null && val.isEmpty) {
+                              return "Email can't be empty";
+                            }
+                            return null;
+                          },
+                          onChanged: (val) {
+                            setState(() => email = val.trim());
+                          }),
+                    ),
+                  ),
+                ],
+              ),
+              //now for the name
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(
+                    width: 350,
+                    height: 50,
+                    child: Card(
+                      child: TextFormField(
+                          decoration: InputDecoration(
+                            labelText: 'Full Name',
+                            border: OutlineInputBorder(),
+                          ),
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.next,
+                          validator: (String? val) {
+                            //making sure the name form is filled
+                            if (val != null && val.isEmpty) {
+                              return "Name can't be empty";
+                            }
+                            return null;
+                          },
+                          onChanged: (val) {
+                            setState(() => fullName = val.trim());
+                          }),
+                    ),
+                  ),
+                ],
+              ),
+              //now for the username
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(
+                    width: 350,
+                    height: 50,
+                    child: Card(
+                      child: TextFormField(
+                          decoration: InputDecoration(
+                            labelText: 'Username',
+                            border: OutlineInputBorder(),
+                          ),
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.next,
+                          validator: (String? val) {
+                            //making sure the username form is filled
+                            if (val != null && val.isEmpty) {
+                              return "Username can't be empty";
+                            }
+                            return null;
+                          },
+                          onChanged: (val) {
+                            setState(() => username = val.trim());
+                          }),
+                    ),
                   ),
                 ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget> [
-                  RaisedButton(
-                    onPressed: () {
-                      //go to edit profile screen
-                      //Navigator.pushNamed(context, '/Edit Profile');
-                    },
-                    child: const Text('Edit Profile'),
-                    color: Colors.blue,
+                children: <Widget>[
+                  //create an 'Edit Profile' button that will update the user's profile using _auth.updateUser
+                  SizedBox(
+                    width: 350,
+                    height: 50,
+                    child: Card(
+                      child: RaisedButton(
+                          child: Text(
+                            'Edit Profile',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                          color: Colors.green,
+                          onPressed: () async {
+                            //update the user's profile
+                            _auth.updateUser(email, fullName, username,
+                                notifications.toString());
+                          }),
+                    ),
                   ),
                 ],
               ),
+              //Display all of the new profile details
+              //create the _buildFutureBuilder
+              _buildFutureBuilder(),
+              _buildFutureBuilderEmail(),
             ],
           ),
         ),
@@ -196,19 +340,18 @@ class _ProfileState extends State<Profile> {
 }
 
 class Group extends StatefulWidget {
-const Group({Key? key}) : super(key: key);
+  const Group({Key? key}) : super(key: key);
 
-@override
-State<Group> createState() => _GroupState();
+  @override
+  State<Group> createState() => _GroupState();
 }
-
 
 class _GroupState extends State<Group> {
   // This widget is the root of your application.
 
   final groupvalueHolder = TextEditingController();
   //need to have the size of groups below
-  List<int> text = [1,2,3,4];
+  List<int> text = [1, 2, 3, 4];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -217,11 +360,8 @@ class _GroupState extends State<Group> {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.yellowAccent[400],
         title: Row(
-          children: <Widget> [
-            Container(
-                width: 130.0,
-                child: Icon(Icons.search)
-            ),
+          children: <Widget>[
+            Container(width: 130.0, child: Icon(Icons.search)),
             Container(
               width: 240.0,
               child: TextField(
@@ -239,9 +379,9 @@ class _GroupState extends State<Group> {
       ),
       body: SingleChildScrollView(
         child: Column(
-          children: <Widget> [
+          children: <Widget>[
             Row(
-              children: const <Widget> [
+              children: const <Widget>[
                 //put the list of groups here???
                 SizedBox(
                   width: 400,
@@ -261,9 +401,7 @@ class _GroupState extends State<Group> {
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                GroupList()
-              ],
+              children: [GroupList()],
             ),
             // Row(
             //   mainAxisAlignment: MainAxisAlignment.center,
@@ -282,11 +420,8 @@ class _GroupState extends State<Group> {
             //     ),
             //   ],
             // ),
-
           ],
-
         ),
-
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -297,8 +432,6 @@ class _GroupState extends State<Group> {
         label: const Text('Create'),
       ),
     );
-
-
   }
 }
 
@@ -309,13 +442,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeState();
 }
 
-
-
-
-
-
 class _HomeState extends State<HomeScreen> {
-
   final valueHolder = TextEditingController();
 
   @override
@@ -326,11 +453,8 @@ class _HomeState extends State<HomeScreen> {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.yellowAccent[400],
         title: Row(
-          children: <Widget> [
-            const SizedBox(
-                width: 130.0,
-                child: Icon(Icons.search)
-            ),
+          children: <Widget>[
+            const SizedBox(width: 130.0, child: Icon(Icons.search)),
             SizedBox(
               width: 240.0,
               child: TextField(
@@ -350,28 +474,27 @@ class _HomeState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget> [
-                SizedBox(
-                  height: 500,
-                  width: 500,
-                  child: SfCalendar(
-                    view: CalendarView.month,
-                    initialSelectedDate: DateTime.now(),
-                    dataSource: MeetingDataSource(_getDataSource()),
-                    monthViewSettings: MonthViewSettings(
-                        appointmentDisplayMode: MonthAppointmentDisplayMode.appointment),
+          children: <Widget>[
+            SizedBox(
+              height: 500,
+              width: 500,
+              child: SfCalendar(
+                view: CalendarView.month,
+                initialSelectedDate: DateTime.now(),
+                dataSource: MeetingDataSource(_getDataSource()),
+                monthViewSettings: MonthViewSettings(
+                    appointmentDisplayMode:
+                        MonthAppointmentDisplayMode.appointment),
+              ),
+            ),
 
-                  ),
-                ),
-
-                    //placeholder calendar.  Should replace with google calendar
+            //placeholder calendar.  Should replace with google calendar
 
             // TableCalendar(
             //   firstDay: DateTime.utc(2010, 10, 16),
             //   lastDay: DateTime.utc(2030, 3, 14),
             //   focusedDay: DateTime.now(),
             // ),
-
 
             /*
             const SizedBox(height: 20.0),
@@ -423,10 +546,10 @@ List<Meeting> _getDataSource() {
   final List<Meeting> meetings = <Meeting>[];
   final DateTime today = DateTime.now();
   final DateTime startTime =
-  DateTime(today.year, today.month, today.day, 9, 0, 0);
+      DateTime(today.year, today.month, today.day, 9, 0, 0);
   final DateTime endTime = startTime.add(const Duration(hours: 2));
-  meetings.add(Meeting(
-      'Payment', startTime, endTime, const Color(0xFF0F8644), false));
+  meetings.add(
+      Meeting('Payment', startTime, endTime, const Color(0xFF0F8644), false));
   return meetings;
 }
 
@@ -463,77 +586,66 @@ class MeetingDataSource extends CalendarDataSource {
 
 //----------------------------- calender sample----------------------------
 
-
-
-
-
-
-
-class GroupList extends StatelessWidget{
-
-
+class GroupList extends StatelessWidget {
   @override
-  Widget build(BuildContext context){
-    final Stream<QuerySnapshot> dataStream = FirebaseFirestore.instance.collection('Groups').snapshots();
+  Widget build(BuildContext context) {
+    final Stream<QuerySnapshot> dataStream =
+        FirebaseFirestore.instance.collection('Groups').snapshots();
     return Container(
-        child: Column(
-          children: [
-            StreamBuilder<QuerySnapshot>(
-              stream: dataStream,
-              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot){
-                if (snapshot.hasError){
-                  //ToDO add snapbar
-                }
-                if(snapshot.connectionState==ConnectionState.waiting){
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-
-                final List storedocs =[];
-                snapshot.data!.docs.map((DocumentSnapshot document){
-                  Map a = document.data() as Map<String, dynamic>;
-                  storedocs.add(a);
-                  // print(a.toString());
-                }).toList();
-
-
-                return Column(
-
-                  children: List.generate(
-                      storedocs.length,
-                          (i)=>Container(
-
-                            padding: EdgeInsets.all(5),
-                            // margin: EdgeInsets.all(5),
-
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.pushNamed(
-                                    context,
-                                  '/gotoGroup',
-                                  arguments: GroupArguments (storedocs[i])
-                                );
-                              },
-                            child: Column(
-                        children: [
-                            Text( 'Group name: ' + storedocs[i]['groupName']
-                            ),
-                            const SizedBox(height:10, width: 200,),
-                            Text(
-                                'Leader name: ' + storedocs[i]['leaderName']
-                            )
-                        ],
-                      ),
-                            ),
-                            )
-                  ),
+      child: Column(
+        children: [
+          StreamBuilder<QuerySnapshot>(
+            stream: dataStream,
+            builder:
+                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.hasError) {
+                //ToDO add snapbar
+              }
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
                 );
-              },
-            )
-          ],
-        ),
-      );
+              }
+
+              final List storedocs = [];
+              snapshot.data!.docs.map((DocumentSnapshot document) {
+                Map a = document.data() as Map<String, dynamic>;
+                storedocs.add(a);
+                // print(a.toString());
+              }).toList();
+
+              return Column(
+                children: List.generate(
+                    storedocs.length,
+                    (i) => Container(
+                          padding: EdgeInsets.all(5),
+                          // margin: EdgeInsets.all(5),
+
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/gotoGroup',
+                                  arguments: GroupArguments(storedocs[i]));
+                            },
+                            child: Column(
+                              children: [
+                                Text(
+                                    'Group name: ' + storedocs[i]['groupName']),
+                                const SizedBox(
+                                  height: 10,
+                                  width: 200,
+                                ),
+                                Text('Leader name: ' +
+                                    storedocs[i]['leaderName'])
+                              ],
+                            ),
+                          ),
+                        )),
+              );
+            },
+          )
+        ],
+      ),
+    );
     // return Container(
     //   child: ElevatedButton(
     //     onPressed: () {

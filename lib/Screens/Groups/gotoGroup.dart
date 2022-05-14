@@ -9,6 +9,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../Models/appUser.dart';
 import 'package:flutter/material.dart';
 import 'package:pay/pay.dart';
+//import auth.dart from services
+import 'package:split/Services/auth.dart';
 
 // class Goto_group extends StatefulWidget {
 //   @override
@@ -24,6 +26,11 @@ class Goto_group extends StatelessWidget {
     final arguments =
         ModalRoute.of(context)!.settings.arguments as GroupArguments;
 
+    //get current user, then print it
+    final AuthService _auth = AuthService();
+    //dynamic user = _auth.currUser();
+    //print("This is my id: :3 " + user);
+
     print(arguments.groupid.toString());
     final String groupName = arguments.groupid["groupName"];
     final double totalPayment = arguments.groupid["totalPayment"];
@@ -34,7 +41,7 @@ class Goto_group extends StatelessWidget {
     final _paymentItems = [
       PaymentItem(
         label: 'Total',
-        amount: '1.00',
+        amount: splitPayment.toString(),
         status: PaymentItemStatus.final_price,
       )
     ];
@@ -119,8 +126,10 @@ class Goto_group extends StatelessWidget {
       ),
     );
   }
-}
 
-void onGooglePayResult(paymentResult) {
-  debugPrint(paymentResult.toString());
+  void onGooglePayResult(paymentResult) {
+    //send the payment result to the database
+    debugPrint("What the fuck");
+    debugPrint("This is the payment result: " + paymentResult.toString());
+  }
 }

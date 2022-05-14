@@ -1,8 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:split/Models/appUser.dart';
-
 
 class UserList extends StatefulWidget {
   const UserList({Key? key}) : super(key: key);
@@ -14,7 +12,6 @@ class UserList extends StatefulWidget {
 class _UserListState extends State<UserList> {
   @override
   Widget build(BuildContext context) {
-
     final users = Provider.of<List<AppUser>>(context);
     //print(users.docs);
     users.forEach((user) {
@@ -22,12 +19,7 @@ class _UserListState extends State<UserList> {
       print("email: " + user.email);
       print("uid: " + user.uid);
       print("notification: " + user.notification.toString());
-
     });
-
-
-    return Container(
-
-    );
+    return Container();
   }
 }
