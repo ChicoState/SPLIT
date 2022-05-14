@@ -23,7 +23,8 @@ class _RegisterState extends State<Register> {
   String fullName = '';
   String username = '';
   bool notifications = false;
-
+  List Groups=[];
+  List Payments=[];
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +144,7 @@ class _RegisterState extends State<Register> {
                         if(_formKey.currentState!.validate()){
                           //loading screen
                           setState(() => loading = true);
-                          dynamic result = await _auth.registerWithEmailAndPassword(email.trim(), password.trim(), fullName.trim(), username.trim(), notifications.toString().trim());
+                          dynamic result = await _auth.registerWithEmailAndPassword(email.trim(), password.trim(), fullName.trim(), username.trim(), Groups, Payments, notifications.toString().trim());
                           if(result == null){
                             setState(() {
                               error = 'Please supply a valid email';

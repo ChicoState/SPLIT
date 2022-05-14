@@ -8,6 +8,7 @@ import 'package:split/Services/auth.dart';
 import 'package:split/Screens/Groups/Create Groups.dart';
 import 'package:split/Screens/Home/home.dart';
 import 'firebase_options.dart';
+import 'package:split/Screens/Home/group.dart';
 
 
 void main() async {
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
             '/createGroup' : (context) => Create_Group(),
             '/Group' : (context) => const Group(),
             '/gotoGroup': (context) =>  Goto_group(),
+            '/home': (context) =>  Home(),
           },
       ),
     );

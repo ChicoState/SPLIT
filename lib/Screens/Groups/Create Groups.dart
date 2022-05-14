@@ -3,34 +3,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:split/shared/constants.dart';
-//import 'package:split/Screens/wrapper.dart';
+import 'package:split/Screens/wrapper.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 
-//variables
-List<String> memberNames = [];
-
-double calculate(double payment, int members) {
-  double split = 0.00;
-  if(payment == 0.0) {
-    return split;
-  } else if (members == 0) {
-    return payment;
-  } else {
-    split = payment / members;
-    return split;
-  }
-}
-
-void addnames(List<String> memberNames, String memberName) {
-  String name = memberName;
-  if (name == '') {
-    print("empty");
-  } else {
-    memberNames.add(memberName);
-    print(memberName);
-  }
-}
-
+final FirebaseAuth auth = FirebaseAuth.instance;
+final User user = auth.currentUser!;
 
 class Create_Group extends StatefulWidget {
   @override
@@ -38,16 +16,20 @@ class Create_Group extends StatefulWidget {
 }
 
 class _Create_GroupState extends State<Create_Group> {
+
+  final String _uid = user.uid.toString();
   final fieldText = TextEditingController();
 
   //variables
-  //final List<String> memberNames = [];
+
+  final List memberNames = [];
+
   String add_check = '';
   String groupName = '';
   String leaderName = '';
-  String memberName = '';
+  List<String> _memberName = List.filled(5, '');
   String payment = '';
-  var paymentDate = '';
+  DateTime paymentDate = DateTime.now();
   var groupCreation = '';
 
 /*
@@ -66,7 +48,23 @@ class _Create_GroupState extends State<Create_Group> {
       print(memberName);
     }
   }
-  */
+
+  // DateTime selectedDate = DateTime.now();
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: paymentDate,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != paymentDate) {
+      setState(() {
+        paymentDate = picked;
+      });
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,6 +104,7 @@ class _Create_GroupState extends State<Create_Group> {
                     setState(() => groupName = val.trim());
                   }
               ),
+
               const SizedBox(height: 20.0), //Group Leader Name stuff
               TextFormField(
                   decoration: textInputDecoration.copyWith(
@@ -127,63 +126,45 @@ class _Create_GroupState extends State<Create_Group> {
 
               const SizedBox(height: 20.0), //Member Name stuff
               Column(
-                children: [
-                  Container(
-                    child: TextFormField(
-                      decoration: textInputDecoration.copyWith(
-                          hintText: 'Member Name'),
-                      textInputAction: TextInputAction.next,
-                      validator: (
-                          String?val) { //making sure the email form is filled
-                        if (val != null && val.isEmpty) {
-                          return "Member Name can't be empty";
-                        }
-                        return null;
-                      },
-                      onChanged: (val) async {
-                        setState(() => memberName = val.trim());
-                        //addnames(memberName);
-                      },
-                      controller: fieldText,
-                    ),
 
-                  ),
-                  SizedBox(height: 15,),
-                  RaisedButton(
-                    onPressed: () async {
-                      clearText(memberName);
+
+                children: List.generate(5, (index) => Container(
+                  padding: EdgeInsets.all(3),
+                  child: TextFormField(
+                    decoration: textInputDecoration.copyWith(
+                        hintText: 'Member Name'),
+                    textInputAction: TextInputAction.next,
+                    validator: (
+                        String?val) { //making sure the email form is filled
+                      if (val != null && val.isEmpty) {
+                        return "Member Name can't be empty";
+                      }
+                      return null;
+
                     },
-                    color: Colors.green,
-                    child: Text('add'),
-                    textColor: Colors.white,
-
+                    onChanged: (val) async {
+                      setState(() => _memberName[index] = val.trim());
+                      // addnames(memberName);
+                    },
+                    // controller: fieldText,
                   ),
-                  Text(
-                    add_check,
-                    style: const TextStyle(color: Colors.indigoAccent, fontSize: 14.0),
-                  ),
-                ],
+                ),
+                ),
 
 
               ),
+              Text("${paymentDate.toLocal()}".split(' ')[0],
 
+                  style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                  foreground: Paint()..shader),
+              ),
+              SizedBox(height: 20.0,),
+              ElevatedButton(
+                onPressed: () => _selectDate(context),
+                child: Text('Select date'),
 
-              const SizedBox(height: 20.0), //Payment Date stuff
-              TextFormField(
-                  decoration: textInputDecoration.copyWith(
-                      hintText: 'Payment Date'),
-                  textInputAction: TextInputAction.next,
-                  keyboardType: TextInputType.datetime,
-                  validator: (
-                      String?val) { //making sure the email form is filled
-                    if (val != null && val.isEmpty) {
-                      return "Payment Date can't be empty";
-                    }
-                    return null;
-                  },
-                  onChanged: (val) {
-                    setState(() => paymentDate = val.trim());
-                  }
               ),
               const SizedBox(height: 20.0), //Payment Amount stuff
               TextFormField(
@@ -206,6 +187,9 @@ class _Create_GroupState extends State<Create_Group> {
                 onPressed: () async {
                   DateTime now = DateTime.now();
                   var payment1 = double.parse(payment);
+                  for(int i=0;i<_memberName.length;i++){
+                    addnames(_memberName[i]);
+                  }
                   print(now);
                   print(groupName);
                   print(leaderName);
@@ -222,12 +206,26 @@ class _Create_GroupState extends State<Create_Group> {
                         "paymentDate": paymentDate,
                         "totalPayment": payment1,
                         "splitPayment": total,
+                        "groupid": "",
                       }).then((value) {
+                        FirebaseFirestore.instance.collection("User").doc(_uid).update(
+                          {
+
+                            "Groups": FieldValue.arrayUnion([value.id]),
+                            "payments": FieldValue.arrayUnion([paymentDate]),
+                          }
+                        );
                     print(value.id);
-                    empty_list();
+
+                        FirebaseFirestore.instance.collection("Groups").doc(value.id).update({
+                            "groupid": value.id
+                        });
+
                   });
+                  // her you have to get the group id from the firebase database to store the id to the user
+                  //it should be a list which means you can add any group
                   Navigator.defaultRouteName;
-                  Navigator.pushNamed(context, '/Group');
+                  Navigator.pushNamed(context, '/home');
                 },
                 child: const Text(
                     "Create Group"),
@@ -238,14 +236,7 @@ class _Create_GroupState extends State<Create_Group> {
       ),
     );
   }
-void empty_list() {
-  memberNames.clear();
-}
-  void clearText(String _m) {
-    addnames(memberNames, _m);
-    add_check = "added";
-    fieldText.clear();
 
-  }
+
 
 }

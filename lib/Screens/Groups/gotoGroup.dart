@@ -1,14 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firestore_cache/firestore_cache.dart';
-import 'package:split/shared/constants.dart';
-import 'package:split/Screens/wrapper.dart';
-import 'package:split/Services/database.dart';
-import 'package:split/Screens/Home/home.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../../Models/appUser.dart';
-import 'package:flutter/material.dart';
-import 'package:pay/pay.dart';
+
+import 'package:split/Screens/Home/group.dart';
+
 
 // class Goto_group extends StatefulWidget {
 //   @override
@@ -30,15 +24,7 @@ class Goto_group extends StatelessWidget {
     final String leaderName = arguments.groupid["leaderName"];
     final List members = arguments.groupid["members"];
     final double splitPayment = arguments.groupid["splitPayment"];
-    final String paymentDate = arguments.groupid["paymentDate"];
-    final _paymentItems = [
-      PaymentItem(
-        label: 'Total',
-        amount: '1.00',
-        status: PaymentItemStatus.final_price,
-      )
-    ];
-
+    final DateTime paymentDate = arguments.groupid["paymentDate"].toDate();
     final Stream<QuerySnapshot> dataStream =
         FirebaseFirestore.instance.collection('Groups').snapshots();
     return Scaffold(
@@ -56,43 +42,51 @@ class Goto_group extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Container(
-                alignment: Alignment.center,
-                // width: 100,
-                padding: const EdgeInsets.all(20),
-                margin: EdgeInsets.all(20),
-                color: Colors.blue,
-                child: Text("Leader: " + leaderName)),
-            Container(
-                alignment: Alignment.center,
-                // width: 100,
-                padding: const EdgeInsets.all(20),
-                margin: EdgeInsets.all(20),
-                color: Colors.red,
-                child: Text("totalPayment: \$" + totalPayment.toString())),
-            Container(
-              child: Column(
-                children: List.generate(
-                    members.length,
-                    (i) => Column(
-                          children: [
-                            Container(
-                                alignment: Alignment.center,
-                                // width: 100,
-                                padding: const EdgeInsets.all(20),
-                                margin: EdgeInsets.all(2),
-                                color: Colors.greenAccent,
-                                child: Text("member: " +
-                                    (i + 1).toString() +
-                                    " " +
-                                    members[i] +
-                                    "\nPayment: \$" +
-                                    splitPayment.toString())),
-                            // const SizedBox(height:20,)
-                          ],
-                        )),
-              ),
-            ),
+                  Container(
+                    alignment: Alignment.center,
+                    // width: 100,
+                    padding: const EdgeInsets.all(20),
+                    margin: EdgeInsets.all(20),
+                    color: Colors.blue,
+                    child:   Text("Leader: " + leaderName)
+                  ),
+                  Container(
+                      alignment: Alignment.center,
+                      // width: 100,
+                      padding: const EdgeInsets.all(20),
+                      margin: EdgeInsets.all(20),
+                      color: Colors.red,
+                      child:   Text("totalPayment: \$" + totalPayment.toString())
+                  ),
+                 Container(
+                      child: Column(
+                      children: List.generate(
+                            members.length,
+                                (i)=>Column(
+                              children: [
+                                Container(
+                                    alignment: Alignment.center,
+                                    // width: 100,
+                                    padding: const EdgeInsets.all(20),
+                                    margin: EdgeInsets.all(2),
+                                    color: Colors.greenAccent,
+                                    child:   Text("member: " + (i+1).toString() +" " + members[i] + "\nPayment: \$" + splitPayment.toString())
+                                ),
+                                // const SizedBox(height:20,)
+                              ],
+                            )
+                      ),
+                    ),
+                 ),
+                Container(
+                    alignment: Alignment.center,
+                    // width: 100,
+                    padding: const EdgeInsets.all(20),
+                    margin: EdgeInsets.all(20),
+                    color: Colors.grey,
+                    child:   Text("paymentDate: " + paymentDate.toString())
+                ),
+
 
             Container(
                 alignment: Alignment.center,

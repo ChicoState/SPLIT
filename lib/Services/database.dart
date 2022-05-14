@@ -18,41 +18,16 @@ class DataBaseService {
   final CollectionReference userGroup = FirebaseFirestore.instance.collection('User');
   final CollectionReference groups = FirebaseFirestore.instance.collection('Groups');
 
-  Future updateUserData(String email, String name, String username, String notification, String uid1) async {
+  Future updateUserData(String email, String name, String username, List groups, List payments,String notification) async {
     return await userGroup.doc(uid).set({
       'email' : email,
       'name': name,
       'username': username,
+      'Groups' : groups,
+      'payments': payments,
       'notification' : notification,
-      'uid' : uid1,
     });
   }
-
-  // Future<dynamic> getData() async {
-  //   dynamic data;
-  //   final DocumentReference document = FirebaseFirestore.instance.collection(
-  //       "User").doc(uid);
-  //   await document.get().then<dynamic>((DocumentSnapshot snapshot) async {
-  //     data = snapshot.data;
-  //   });
-  // }
-  // Stream<QuerySnapshot> getStream() {
-  //   return userGroup.snapshots();
-  // }
-  // Future<dynamic> getData() async {
-  //   return await FirebaseFirestore.instance
-  //       .collection("User")
-  //       .where("email", isEqualTo: "email_here")
-  //       .getDocuments();
-  // }
-
-  // dynamic getData() {
-  //
-  //   final DocumentReference document = FirebaseFirestore.instance.collection(
-  //       "User").doc(uid);
-  //   val snapshot = document.get();
-  //   return snapshot.data;
-  // }
 
 
   //get user list from snapshot
@@ -64,8 +39,8 @@ class DataBaseService {
             name: doc.data().toString().contains('name') ? doc.get('name') : 'cannot find',
             username: doc.data().toString().contains('username') ? doc.get('username') : 'cannot find',
             email: doc.data().toString().contains('email') ? doc.get('email') : 'cannot find',
+            groups: doc.data().toString().contains('Groups') ? doc.get("groupID") : 'none',
             notification: doc.data().toString().contains('notification') ? doc.get('notification') : 'cannot find',
-            groupId: doc.data().toString().contains('groupID') ? doc.get("groupID") : 'none',
         );
       }).toList();
     } catch(e) {
@@ -86,6 +61,9 @@ class DataBaseService {
     return groups.snapshots()
         .map(_myUserListFromSnapshot);
   }
+
+
+
 }
 
 /*
