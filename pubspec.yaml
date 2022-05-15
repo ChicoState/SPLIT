@@ -39,6 +39,7 @@ dependencies:
   flutter_spinkit: ^5.1.0
   table_calendar: ^3.0.4
   pay: ^1.0.8
+  path_provider: ^2.0.1
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -79,7 +80,7 @@ flutter:
   #   - images/a_dot_ham.jpeg
   # To add assets to your application, add an assets section, like this:
   assets:
-     - assets/
+     - lib/Screens/Groups/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
